@@ -39,7 +39,8 @@
 			if(x == 1){
 				obj.put("result", "success");
 				String sql2 = "select * from mysns_comment";
-				rs = pstmt.executeQuery(sql2);
+				pstmt = conn.prepareStatement(sql2);
+				rs = pstmt.executeQuery();
 				if(rs.next()){
 					obj.put("lastId", rs.getInt("pid"));
 				}
