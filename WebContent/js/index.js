@@ -49,7 +49,7 @@ $(function(){
         });
     });
 
-    $('.JoinBtnCancel').click(function(){
+    $('.joinBtnCancel').click(function(){
         if(window.confirm("가입을 취소 하시겠습니까?")){
             $('.Join').hide();
             $('.Login').show();
@@ -57,7 +57,7 @@ $(function(){
 
     });
     var isJoin=false;
-    $('.JoinBtnJoin').click(function(){
+    $('.joinBtnJoin').click(function(){
         if(isJoin) return false;
         var cid=$('.joinTxtID').val();
         var cpw=$('.joinTxtPw').val();
@@ -65,7 +65,7 @@ $(function(){
         
         if(!cid)
         {
-            window.alert('아이디를 입력하세요!');
+            window.alert('아이디를 입력하세요');
             return false;
         }
         else if(!cpw){
@@ -91,9 +91,7 @@ $(function(){
                 //console.log(data);
                 if(data.result== 'success')
                 {
-                    alert(
-                        "회원가입완료"
-                    );
+                    alert("회원가입완료");
                     $('.Join').hide();
                     $('.Login').show();
                 }
@@ -166,7 +164,7 @@ $(function(){
     });
     $('.writeBtnCancel').click(function(){
         if(window.confirm("작성을 취소합니까?")){
-            $('write').hide();
+            $('.Write').hide();
             $('.Main').show();
         }
     });
