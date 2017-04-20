@@ -38,7 +38,8 @@
 			x = pstmt.executeUpdate();
 			if(x == 1){
 				obj.put("result", "success");
-				rs = pstmt.executeQuery();
+				String sql2 = "select * from mysns_comment";
+				rs = pstmt.executeQuery(sql2);
 				if(rs.next()){
 					obj.put("lastId", rs.getInt("pid"));
 				}

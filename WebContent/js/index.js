@@ -203,15 +203,144 @@ $(function() {
                         $('<div></div>').addClass('Comments').appendTo(comment);
                         item.appendTo($('.Items'));
 
-                        //loadComment(id);
+                        loadComment(id);
                     }
+                }
+                else{
+                	window.alert("오류 발생");
+                	$('.Main').hide();
+                	$('.Login').show();
                 }
             },
             error: function(){
-
+            	window.alert("에러왕!");
             }
         });
     };
+    
+    var loadComment = function(postId){
+        if(!postId) return false;
+        var target = $('div.Item[data-id='+postId+'] .Comments');
+        $.ajax({
+            url:'http://localhost:8080/test/js/commentLoad.jsp',
+            data : {postId:postId},
+            dataType : 'jsonp',
+            success : function(data){
+                if(data.result == "success"){
+                    var cnt = data.data.length;
+
+                    for(var i = 0; i< cnt; i++){
+                        var id = data.data[i].id;
+                        var content = data.data[i].content;
+                        var writer = data.data[i].writer;
+
+                        var commentItem = $('<div></div>').addClass('CommentItem').attr('data-id',id);
+                        $('<h4></h4>').text(writer).appendTo(commentItem);
+                        $('<p></p>').text(content).appendTo(commentItem);
+                        $('<button></button>').addClass('AppBtnRed commentBtnDel').text('삭제').appendTo(target);
+                        commentItem.appendTo(target);
+                    }
+                }
+                else{
+                    window.alert("오류가 발생하였습니다.");
+                }
+            },
+            error : function(){
+                window.alert("에러왕!");
+            }
+        });
+    };
+
+    var isComment = false;
+    $(document.body).on("click",".commentBtnWrite",function(){
+        if(isComment) return false;
+        var parentId = $(this).parent().parent().attr('data-id');
+        var content = $(this).prev().val();
+        var comments = $(this).next();
+        if(!content){
+            window.alert("댓글입력 바람");
+            return false;
+        }
+        isComment = true;
+        $.ajax({
+            url:'http://localhost:8080/test/js/commentPost.jsp',
+            data:{
+                parentId : parentId,
+                content : content,
+                writer : currentUser
+            },
+            dataType:'jsonp',
+            success : function(data){
+                if(data.result == "success"){
+                    var lid = data.lastId;
+                    var commentItem = $('<div></div>').addClass('CommentItem').attr('data-id',lid);
+                    $("<h4></h4>").text(currentUser).appendTo(commentItem);
+                    $("<p></p>").text(content).appendTo(commentItem);
+                    $("<button></button>").addClass('AppBtnRed commentBtnDel').text('삭제').appendTo(commentItem);
+                    commentItem.appendTo(comments);
+                }
+                else{
+                    window.alert("오류발생");
+                }
+                isComment = false;
+            },
+            error : function(){
+                window.alert("에러왕");
+                isComment = false;
+            }
+        });
+    });
+    
+    $(document.body).on("click",".commentBtnDel",function(){
+    	if(window.confirm("댓글을 삭제하시겠습니까?")){
+    		var id = $(this).parent().attr('data-id');
+    		var removeTarget = $(this).parent();
+    		
+    		$.ajax({
+    			url : 'http://localhost:8080/test/js/commentDel.jsp',
+    			data : {
+    				postId : id
+    			},
+    			dataType : 'jsonp',
+    			success : function(data){
+    				if(data.result == "success"){
+    					removeTarget.remove();
+    				}
+    				else{
+    					window.alert("오류가 발생했습니다.");
+    				}
+    			},
+    			error : function(){
+    				window.alert("에러왕!");
+    			}
+    		});
+    	}
+    });
+    $(document.body).on("click",".mainBtnDel",function(){
+    	if(window.confirm("삭제하시겠습니까?")){
+    		var id = $(this).parent().parent().parent().attr('data-id');
+    		var removeTarget = $(this).parent().parent().parent();
+    		
+    		$.ajax({
+    			url : 'http://localhost:8080/test/js/del.jsp',
+    			data : {
+    				postId : id
+    			},
+    			dataType : 'jsonp',
+    			success : function(data){
+    				if(data.result == "success"){
+    					removeTarget.remove();
+    				}
+    				else{
+    					window.alert("오류가 발생했습니다.");
+    				}
+    			},
+    			error : function(){
+    				window.alert("에러왕");
+    			}
+    		});
+    	}
+    });
     //$('.Main').show();
     //$('.Write').show();
 });
