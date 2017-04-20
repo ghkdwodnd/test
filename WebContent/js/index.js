@@ -1,244 +1,178 @@
 $(function(){
+    //변수
+    var currentUser = null;
+
+    // 로그인 화면을 표시
     $('.Login').show();
-    $('.Main').hide();
 
-    $('.loginBtnJoin').on("click",function(){
-        $('.Login').hide();
-        $('.Join').show();
-
-
-    });
-
-        var currentUser = null;
-        var isLogin = false;
-
-    $('.loginBtnLogin').on("click",function(){
+    /* 로그인 화면 */
+    // 로그인 버튼
+    var isLogin = false;
+    $('.loginBtnLogin').click(function(){
         if(isLogin) return false;
         var id = $('.loginTxtID').val();
         var pw = $('.loginTxtPw').val();
-        alert(id);
         if(!id){
-            window.alert('아이디 입력좀');
-            return false;
+            alert('아이디를 입력하세요'); return false;
         }else if(!pw){
-            window.alert('비밀번호 입력좀')
-            return false;
+            alert('비밀번호를 입력하세요'); return false;
         }
-        isLogin=true;
+
+        isLogin = true;
+
         $.ajax({
-            url:'http://localhost:8080/test/js/login.jsp',
-            data:{id:id, pw:pw},
-            dataType:'jsonp',
-            success:function(data){
-                if(data.result== 'success')
-                {
+            url : "http://localhost:8080/test/js/login.jsp",
+            data : {id:id, pw:pw},
+            dataType : 'jsonp',
+            success : function(data) {
+                //로그인 성공
+                if(data.result == 'success'){
+                    alert('로그인 성공');
                     $('.Login').hide();
                     $('.Main').show();
-                    $('.user').text(id);
+
+                    $('.NaviPadding > p').html('안녕하세요, <b>' + id + "</b>님");
+                    currentUser = id;
                     loadPosts();
-                }
-                else{
-                    alert("뭔가가 잘못됫다");
-                    isLogin = false;
-                }
+                }else { alert('로그인 오류 발생'); } //로그인 실패 - 오류
+                
+                isLogin = false;
             },
-            error:function(){
-                window.alert('실패다')
+            error : function(){
+                alert('오류가 발생');
                 isLogin = false;
             }
         });
     });
 
-    $('.joinBtnCancel').click(function(){
-        if(window.confirm("가입을 취소 하시겠습니까?")){
-            $('.Join').hide();
-            $('.Login').show();
-        }
-
+    // 회원가입 버튼
+    $('.loginBtnJoin').click(function(){
+        $('.Login').hide();
+        $('.Join').show();
     });
-    var isJoin=false;
+
+    /* 회원가입 화면 */
+    // 가입하기 버튼
+    var isJoin = false; // 회원가입 중인지 여부를 파악하는 변수
     $('.joinBtnJoin').click(function(){
-        if(isJoin) return false;
-        var cid=$('.joinTxtID').val();
-        var cpw=$('.joinTxtPw').val();
-        var cpwc=$('.joinTxtPwc').val();
-        
-        if(!cid)
-        {
-            window.alert('아이디를 입력하세요');
-            return false;
+        if(isJoin) return false; // 이미 회원가입 중이라면 수행하지 않음
+        var id = $('.joinTxtID').val();
+        var pw = $('.joinTxtPw').val();
+        var pwc = $('.joinTxtPwc').val();
+        if(!id){
+            window.alert('아이디를 입력하세요'); return false;
+        } else if(!pw){
+            window.alert('비밀번호를 입력하세요'); return false;
+        } else if(!pwc){
+            window.alert('비밀번호 확인을 입력하세요'); return false;
+        } else if(pw != pwc){
+            window.alert('비밀번호가 일치하지 않습니다'); return false;
         }
-        else if(!cpw){
-            window.alert('패스워드를 입력하세요!');
-            return false;
-        }
-         else if(!cpwc){
-            window.alert('패스워드 확인를 입력하세요!');
-            return false;
-        }
-         else if(cpw != cpwc){
-            window.alert('패스워드가  일치하지 않습니다!');
-            return false;
-        }
-        isJoin = true;
 
-
+        isJoin = true; // 회원가입 시도
         $.ajax({
-            url:'http://localhost:8080/test/js/register.jsp',
-            data:{id:cid,pw:cpw},
-            dataType:'jsonp',
-            success:function(data){
-                //console.log(data);
-                if(data.result== 'success')
-                {
-                    alert("회원가입완료");
-                    $('.Join').hide();
-                    $('.Login').show();
-                }
-                else{
-                    alert("회원가입시 서버와 통신에서 문제 발생!!!");
-                    isJoin = false;
-                }
+            url : "http://localhost:8080/test/js/join.jsp",
+            data : {id:id, pw:pw},
+            dataType : 'jsonp',
+            success : function(data) {
+                console.log(data);
+               if(data.result == "success") {
+                   alert('회원가입 완료! 메인화면으로 돌아갑니다.');
+                   $('.Join').hide();
+                   $('.Login').show();
+               }
+               else {
+                   alert('오류가 발생하였습니다.');
+               }
             },
-            error:function(){
-               alert("회원가입시 오류발생!!!"); 
-               isJoin = false;
+            error : function () {
+                alert('오류가 발생하였습니다.');
             }
         });
     });
-
- // $('.Write').show();
-    /* 메인화면 */
-    // 메인화면을 표시
-    // $('.Main').show();
-    $('.mainBtnWrite').click(function(){
-        $('.Main').hide();
-        $('.Write').show();
-        $('.writeTxtSubject').val('');
-        $('.writeTxtContent').val('');
-    });
-    $('.mainBtnLogout').click(function(){
-        if (window.confirm('로그아웃?')) {
-            location.reload();  
-        }
-    });
-    var isPost = false;
-    $('.writeBtnWrite').click(function(){
-        if(isPost) return false;
-        var subject = $('.writeTxtSubject').val();
-        var content = $('.writeTxtContent').val();
-        if(!subject){
-            window.alert("제목을 입력하세요");
-            return false;
-        }else if(!content){
-            window.alert("글 내용을 입력하세요");
-            return false;
-        }
-
-        if(window.confirm("글을 작성하시겠습니까?")){
-            isPost = true;
-            $.ajax({
-                url:'http://localhost:8080/test/js/post.jsp',
-                data:{subject:subject, //server변수:client변수, key:value
-                    content:content,
-                    writer: currentUser
-                },
-                dataType:'jsonp',
-                success:function(data){
-                    if(data.result =='success'){
-                        $('.Write').hide();
-                        $('.Main').show();
-                        loadPosts();
-                    }else{
-                        window.alert("서버를 싼거 쓰지말고 비싼것 좀 쓰자 인간적으로");
-                        
-                    }
-                    isPost=false;
-                },//성공 콜백함수
-                error:function(){
-                    window.alert("인터넷 좀 비싼거 쓰자 발생");
-                    isPost=false;
-                }//실패 콜백함수
-            });
-        }
-    });
-    $('.writeBtnCancel').click(function(){
-        if(window.confirm("작성을 취소합니까?")){
-            $('.Write').hide();
-            $('.Main').show();
+    
+    // 가입취소 버튼
+    $('.joinBtnCancel').click(function(){
+        if(window.confirm('가입을 취소하시겠습니까?')){
+            $('.Join').hide();
+            $('.Login').show();
         }
     });
 
+    /* 메인 화면 */
+    // 게시글과 댓글을 불러와 화면에 출력
     var loadPosts = function(){
         $('.Items').empty();
 
+        // 데이터를 AJAX로 불러옵니다.
         $.ajax({
-            url:'http://localhost:8080/test/js/load.jsp',
-                data:{},
-                dataType:'jsonp',
-            success:function(data){
-                if(data.result=="success"){
-                    var cnt = data.data.length; //서버로부터 오는 data.  제이슨 데이터 data.length
-                    for(var i = 0; i<cnt; i++){
+            url : "http://localhost:8080/test/js/load.jsp",
+            data : {},
+            dataType : 'jsonp',
+            success : function(data){
+                if(data.result == "success") {
+                    var cnt = data.data.length;
+                    for(var i = 0; i < cnt; i++) {
                         var id = data.data[i].id;
                         var subject = data.data[i].subject;
                         var content = data.data[i].content;
                         var writer = data.data[i].writer;
                         var writedate = data.data[i].writedate;
-
-                        var item = $('<div></div>').attr('data-id', id).addClass('Item'); // <div class='Item' data-id = '1'></div>
-                        var itemText = $('<div></div>').addClass('ItemText').appendTo(item); // <div class='Item' data-id = '1'><div class='ItemText'></div></div>
+                        
+                        var item = $('<div></div>').attr('data-id', id).addClass('Item');
+                        var itemText = $('<div></div>').addClass('ItemText').appendTo(item);
 
                         $('<h4></h4>').text(subject).appendTo(itemText);
-                        $('<h6></h6>').text('작성시간 :' + writedate).appendTo(itemText);
+                        $('<h6></h6>').text('작성시간 : ' + writedate).appendTo(itemText);
                         $('<p></p>').text(content).appendTo(itemText);
 
-                        if(writer == currentUser){
+                        if(writer == currentUser) {
                             var itemButtons = $('<div></div>').addClass('ItemButtons').appendTo(itemText);
                             $('<button></button>').addClass('mainBtnDel AppBtnRed').text('삭제하기').appendTo(itemButtons);
                         }
 
-                        var comment = $('<div></div>').addClass('Commment').appendTo(item);
+                        // 댓글
+                        var comment = $('<div></div>').addClass('Comment').appendTo(item);
+                        $('<input />').attr({ type : 'text', placeholder : '댓글입력...'}).addClass('itemTxtComment').appendTo(comment);
+                        $('<button></button>').addClass('commentBtnWrite AppBtnBlue').text('댓글달기').appendTo(comment);
 
-                        $('<input />').attr({type:'text', placeholder:'댓글입력'}).addClass('itemTxtComment').appendTo(comment);
-                        $('<button></button>').addClass('commentBtnWrite AppBtnBlue').text('댓글달기').appendTo(comment); 
-
+                        // 댓글 목록이 출력되는 곳
                         $('<div></div>').addClass('Comments').appendTo(comment);
 
                         item.appendTo($('.Items'));
 
+                        // 댓글 불러오기
                         loadComment(id);
                     }
                 }
-                    else{
-                    window.alert('서버 오류가 발생햇다고요');
+                else {
+                    alert('게시글 로드 오류 발생');
                     $('.Main').hide();
                     $('.Login').show();
-                    }
+                }
             },
-            error:function(){
-                window.alert('오류다 또 오류라고!!');
-                    $('.Main').hide();
-                    $('.Login').show();
+            error : function(){
+                alert('오류발생');
+                $('.Main').hide();
+                $('.Login').show();
             }
-   
-        });  
+        });
     };
-    var loadComment = function(PostId){
-        if(!PostId) return false;
-        var target = $('div.Item[data-id='+PostId+'] .Comments');
 
+    // 댓글 불러오기
+    var loadComment = function(postId){
+        if(!postId) return false;
+        var target = $('div.Item[data-id=' + postId + '] .Comments');
+
+        // 데이터를 AJAX로 불러옵니다.
         $.ajax({
-            url:'http://localhost:8080/test/js/commentLoad.jsp',
-            data:{
-                postId : PostId
-            },
-            dataType:'jsonp',
-            success:function(data){
+            url : "http://localhost:8080/test/js/commentLoad.jsp",
+            data : {postId : postId},
+            dataType : 'jsonp',
+            success : function(data){
                 if(data.result == "success"){
                     var cnt = data.data.length;
-
-                    for(i=0; i<cnt; i++){
+                    for(var i = 0; i < cnt; i++){
                         var id = data.data[i].id;
                         var content = data.data[i].content;
                         var writer = data.data[i].writer;
@@ -247,88 +181,155 @@ $(function(){
                         $('<h4></h4>').text(writer).appendTo(commentItem);
                         $('<p></p>').text(content).appendTo(commentItem);
                         $('<button></button>').addClass('AppBtnRed commentBtnDel').text('삭제').appendTo(commentItem);
-
                         commentItem.appendTo(target);
                     }
-                }else{
-                    window.alert('오류발생')
+                }else {
+                    alert('오류발생');
                 }
             },
-            error:function(){
-                window.alert('오류발생')
-
+            error : function(){
+                alert('오류발생');
             }
         });
     };
+    
+    // 작성한 글 삭제
+    $(document.body).on('click', '.mainBtnDel', function(){
+        if(confirm('삭제?')){
+            var id = $(this).parent().parent().parent().attr('data-id');
+            var removeTarget = $(this).parent().parent().parent();
 
-    var isComment = false;
+            $.ajax({
+                url : "http://localhost:8080/test/js/del.jsp",
+                data : {postId : id},
+                dataType : 'jsonp',
+                success : function(data){
+                    if(data.result == "success") {
+                        removeTarget.remove();
+                    }else alert('오류');
+                },
+                error : function(){
+                    alert('오류');
+                }
+            });
+        }
+    });
+    // 댓글달기
+    var isComment = false; // 댓글을 달고 있는지 확인하는 변수
     $(document.body).on('click', '.commentBtnWrite', function(){
         if(isComment) return false;
 
         var parentId = $(this).parent().parent().attr('data-id');
         var content = $(this).prev().val();
-        var comments = $(this).next();
-
+        var comments = $(this).next(); // 나중에 댓글을 추가할 Comments DOM을 불러오기
         if(!content){
-            window.alert('댓글입력');
+            alert('댓글을 입력하세요');
             return false;
         }
         isComment = true;
-    
-    $.ajax({
-        url:'http://localhost:8080/test/js/commentPost.jsp',
-        data:{
-            parentId : parentId,
-            content :content,
-            writer : currentUser
-        },
-        dataType:'jsonp',
-        success:function(data){
-            if(data.result == "success"){
-                var lid = data.lastId;
-                var commentItem = $('<div></div>').addClass('CommentItem').attr('data-id', lid);
-                $('<h4></h4>').text(currentUser).appendTo(commentItem);
-                $('<p></p>').text(content).appendTo(commentItem);
-                $('<button></button>').addClass('AppBtnRed commentBtnDel').text('삭제').appendTo(commentItem);
 
-                commentItem.appendTo(comments);
-            }else{
-                window.alert('오류가 발생하였습니다.')
+        $.ajax({
+            url : "http://localhost:8080/test/js/commentPost.jsp",
+            data : {parentId : parentId, content : content, writer : currentUser},
+            dataType : 'jsonp',
+            success : function(data){
+                console.log(data);
+                if(data.result == "success"){
+                    var lid = data.lastId;
+                    var commentItem = $('<div></div>').addClass('CommentItem').attr('data-id', lid);    // 삭제할 때 필요한 댓글 번호
+                    $('<h4></h4>').text(currentUser).appendTo(commentItem); // 댓글 작성자(현재사용자)
+                    $('<p></p>').text(content).appendTo(commentItem);   // 댓글 내용
+                    $('<button></button>').addClass('AppBtnRed commentBtnDel').text('삭제').appendTo(commentItem);    //삭제버튼
+                    commentItem.appendTo(comments);
+                }else alert('댓글 달기 오류');
+                isComment = false;
+            },
+            error : function(){
+                alert('오류');
+                isComment = false;
             }
-            isComment= false;
-        },
-        error:function(){
-            window.alert('오류가 발생하였습니다.')
-            isComment = false;
-
-         }
         });
     });
 
-    $(document).on('click', '.commentBtnDel', function(){
-        if(window.confirm('댓글을 삭제하시겠습니까?')){
+    // 댓글 삭제
+    $(document.body).on('click', '.commentBtnDel', function(){
+        if(confirm('댓글 삭제?')){
             var id = $(this).parent().attr('data-id');
             var removeTarget = $(this).parent();
-
             $.ajax({
-                url:'http://localhost:8080/test/js/commentDel.jsp',
-                data:{
-                    postId : id
-                },
+                url : "http://localhost:8080/test/js/commentDel.jsp",
+                data:{postId:id},
                 dataType:'jsonp',
                 success:function(data){
-                    if(data.result=="success"){
+                    if(data.result == "success")
                         removeTarget.remove();
-                    }else{
-                        window.alert('오류가 발생하였습니다');
-                    }
-                },
-                error:function(){
-                    window.alert('오류가 발생하였습니다.');
-
-                }
-                
+                    else
+                        window.alert('오류');
+                }            
             });
+        }
+    });
+
+    $('.mainBtnWrite').click(function(){
+        $('.Main').hide();
+        $('.Write').show();
+        $('.writeTxtSubject').val('');
+        $('.writeTxtContent').val('');
+    });
+
+    $('.mainBtnLogout').click(function(){
+        if(confirm('로그아웃 하시겠습니까?'))
+            location.reload();
+    });
+
+
+    /* 글쓰기 화면 */
+    var isPost = false; // 게시글 작성 중인지 체크하는 변수
+    $('.writeBtnWrite').click(function(){
+        if(isPost) return false;
+        var subject = $('.writeTxtSubject').val();
+        var content = $('.writeTxtContent').val();
+
+        if(!subject){
+            alert('글제목입력'); return false;
+        }
+        else if (!content){
+            alert('글내용입력'); return false;
+        }
+
+        if(window.confirm('글을 작성하시겠습니까?')){
+            isPost = true;
+            $.ajax({
+                url : "http://localhost:8080/test/js/post.jsp",
+                data : {
+                    subject : subject,
+                    content : content,
+                    writer : currentUser
+                },
+                dataType : 'jsonp',
+                success : function(data) {
+                    if(data.result == "success"){
+                        $('.Write').hide();
+                        $('.Main').show();
+                        loadPosts();
+                    }else {
+                        window.alert("오류 발생");
+                    }
+                    isPost = false;
+                }, 
+                error : function(){
+                    window.alert("오류 발생");
+                    isPost = false;
+                }
+            });
+        }
+    });
+
+    $('.writeBtnCancel').click(function(){
+        if(confirm('작성을 취소하시겠습니까?')){
+            $('.Write').hide();
+            $('.Main').show();
+            loadPosts();
         }
     });
 });
