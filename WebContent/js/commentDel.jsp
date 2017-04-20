@@ -6,10 +6,6 @@
 	request.setCharacterEncoding("utf-8");
 	String callback = request.getParameter("callback");
 	String postId = request.getParameter("postId");
-	if (postId == null) {
-		postId = "0";
-	}
-	int postIdint = Integer.parseInt(postId);
 	
 	Connection conn = null;
 	PreparedStatement pstmt = null;
@@ -26,7 +22,7 @@
 		conn = DriverManager.getConnection(url,did,dpw);
 		String sql = "delete from mysns_comment where pid = ?";
 		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, postIdint);
+		pstmt.setString(1, postId);
 		
 		x = pstmt.executeUpdate();
 		
@@ -42,6 +38,5 @@
 		if(pstmt!=null) try{pstmt.close();} catch(Exception e){}
 		if(conn!=null) try{conn.close();} catch(Exception e){}
 	}
-	System.out.println(postIdint);
 	out.println(callback + "(" + obj  + ")");
 %>
